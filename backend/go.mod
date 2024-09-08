@@ -1,4 +1,4 @@
-module next_go_app
+module next_go_app/backend
 
 go 1.23.1
 
