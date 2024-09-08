@@ -16,6 +16,7 @@ const Webcamera = (props: WebcameraProps) => {
   const { url, setUrl } = props;
 
   const webcamRef = useRef<Webcam>(null);
+  
 
   const capture = () => {
     const imageSrc = webcamRef.current?.getScreenshot() ?? null;
