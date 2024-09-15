@@ -10,6 +10,7 @@ import (
 
 func UploadImg(c *gin.Context) {
 	file, err := c.FormFile("file")
+
 	if err != nil {
 		c.String(http.StatusBadRequest, "get form err: %s", err.Error())
 		return
