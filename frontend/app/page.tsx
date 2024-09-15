@@ -4,65 +4,48 @@ import { createWorker } from "tesseract.js";
 import Webcamera from "@/features/webcam/webcamera";
 import { useState } from "react";
 import Preview from "@/features/webcam/preview";
-import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
+import { Camera } from "lucide-react";
 
 const Page = () => {
   const [url, setUrl] = useState<string | null>(null);
 
   //画像読み取り
-  const readImage = async (url: string | null) => {
-    if (url) {
-      const worker = await createWorker("jpn");
-      const ret = await worker.recognize(url);
-      await worker.setParameters({
-        tessedit_char_blacklist: "賞味期限",
-      });
-      //console.log(ret.data.text);
-      await worker.terminate();
-    }
-  };
-  
-  const base64ToBlob = (base64: string) => {
-    const byteString = atob(base64.split(",")[1]);
-    const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+  // const readImage = async (url: string | null) => {
+  //   if (url) {
+  //     const worker = await createWorker("jpn");
+  //     const ret = await worker.recognize(url);
+  //     await worker.setParameters({
+  //       tessedit_char_blacklist: "賞味期限",
+  //     });
+  //     //console.log(ret.data.text);
+  //     await worker.terminate();
+  //   }
+  // };
 
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
-  };
 
-  const sendImg = async () => {
-    if (!url) {
-      console.error("No image URL found");
-      return;
-    }
-
-    const formData = new FormData();
-    const blob = base64ToBlob(url);
-    formData.append("file", blob, `${uuidv4()}.jpg`);
-
-   try{
-    await axios.post("http://localhost:8080/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-   }
-   catch (e) {
-     console.error(e);
-   }
-  };
 
   return (
     <div>
-      <Webcamera url={url} setUrl={setUrl}></Webcamera>
-      {url && <Preview url={url}></Preview>}
-      <button onClick={() => readImage(url)}>表示</button>
-      <button onClick={sendImg}>送信</button>
+      <div className="flex flex-col h-screen bg-gray-100">
+        <header className="bg-white shadow-sm p-4">
+          <h1 className="text-xl font-semibold text-center flex items-center justify-center gap-4">
+            <Camera />
+            Expiration Date Reader
+          </h1>
+        </header>
+
+        <main className="flex-1 flex flex-col items-center justify-center p-4">
+          {!url ? (
+            <>
+              <Webcamera url={url} setUrl={setUrl} />
+            </>
+          ) : (
+            <>
+              <Preview url={url} setUrl={setUrl}/>
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
