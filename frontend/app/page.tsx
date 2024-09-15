@@ -1,44 +1,51 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Webcam from "react-webcam";
-import Image from "next/image";
-
-const videoConstraints = {
-  width: 500,
-  height: 500,
-  facingMode: "user",
-};
+import { createWorker } from "tesseract.js";
+import Webcamera from "@/features/webcam/webcamera";
+import { useState } from "react";
+import Preview from "@/features/webcam/preview";
+import { Camera } from "lucide-react";
 
 const Page = () => {
-  const webcamRef = useRef<Webcam>(null);
   const [url, setUrl] = useState<string | null>(null);
 
-  const capture = () => {
-    const imageSrc = webcamRef.current?.getScreenshot() ?? null;
-    setUrl(imageSrc);
-  };
+  //画像読み取り
+  // const readImage = async (url: string | null) => {
+  //   if (url) {
+  //     const worker = await createWorker("jpn");
+  //     const ret = await worker.recognize(url);
+  //     await worker.setParameters({
+  //       tessedit_char_blacklist: "賞味期限",
+  //     });
+  //     //console.log(ret.data.text);
+  //     await worker.terminate();
+  //   }
+  // };
+
+
 
   return (
     <div>
-      <Webcam
-        audio={false}
-        width={500}
-        height={500}
-        ref={webcamRef}
-        mirrored={true}
-        screenshotFormat="image/jpeg"
-        videoConstraints={videoConstraints}
-      />
-      <button onClick={capture}>撮影</button>
-      {url && (
-        <Image
-          src={url}
-          width={500}
-          height={500}
-          alt="description of the image"
-        />
-      )}
+      <div className="flex flex-col h-screen bg-gray-100">
+        <header className="bg-white shadow-sm p-4">
+          <h1 className="text-xl font-semibold text-center flex items-center justify-center gap-4">
+            <Camera />
+            Expiration Date Reader
+          </h1>
+        </header>
+
+        <main className="flex-1 flex flex-col items-center justify-center p-4">
+          {!url ? (
+            <>
+              <Webcamera url={url} setUrl={setUrl} />
+            </>
+          ) : (
+            <>
+              <Preview url={url} setUrl={setUrl}/>
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
